@@ -1,41 +1,35 @@
 import java.util.List;
 
-public class Move{
+public class Move {
+    private Position startPos;
+    private Position targetPos;
 
-    private Position init_pos;
-    private Position final_pos;
-
-    public Move(Position init_pos, Position final_pos) {
-        this.init_pos = init_pos;
-        this.final_pos = final_pos;
+    public Move(Position startPos, Position targetPos) {
+        this.startPos  = startPos;
+        this.targetPos = targetPos;
     }
 
-    public Move ReserveMove() {
-        /*
-        This function returns a new Move object with the initial and final positions reversed.
-        @param: None
-        @return: Move
-        */
-        return new Move(this.final_pos, this.init_pos);
+    public Position getStartPos()  { return startPos; }
+    public Position getTargetPos() { return targetPos; }
+
+    public Move reversed() {
+        return new Move(this.targetPos, this.startPos);
     }
 
-    public static boolean IsValidMove(Move m1, List<Move> forbiddenMoves) {
-        if (m1 == null) {
-            return false;
-        }
-        Move reversedMove = m1.ReserveMove();
-        if (forbiddenMoves.contains(m1) || forbiddenMoves.contains(reversedMove)) {
-            return false;
-        }
-        return true;
+    public static boolean IsValidMove(Move move, List<Move> forbiddenMoves) {
+        if (move == null) return false;
+        return !forbiddenMoves.contains(move) && !forbiddenMoves.contains(move.reversed());
     }
 
-    public boolean equals(Move other) {
-        /*
-        This function checks if two Move objects are equal based on their initial and final positions.
-        @param: Move other
-        @return: boolean
-        */
-        return this.init_pos.equals(other.init_pos) && this.final_pos.equals(other.final_pos);
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Move)) return false;
+        Move other = (Move) obj;
+        return this.startPos.equals(other.startPos) && this.targetPos.equals(other.targetPos);
+    }
+
+    @Override
+    public int hashCode() {
+        return 81 * startPos.hashCode() + targetPos.hashCode();
     }
 }
