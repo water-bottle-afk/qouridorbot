@@ -18,7 +18,7 @@ public class Logic {
 
         gScore.put(start, 0);
         cameFrom.put(start, null);
-        openSet.add(new int[]{h(start, goalRow), 0, start.x, start.y});
+        openSet.add(new int[]{heuristic(start, goalRow), 0, start.x, start.y});
 
         while (!openSet.isEmpty()) {
             int[] node = openSet.poll();
@@ -37,14 +37,14 @@ public class Logic {
                 if (tentG < gScore.getOrDefault(nb, Integer.MAX_VALUE)) {
                     gScore.put(nb, tentG);
                     cameFrom.put(nb, current);
-                    openSet.add(new int[]{tentG + h(nb, goalRow), tentG, nb.x, nb.y});
+                    openSet.add(new int[]{tentG + heuristic(nb, goalRow), tentG, nb.x, nb.y});
                 }
             }
         }
         return Collections.emptyList();
     }
 
-    private static int h(Position pos, int goalRow) {
+    private static int heuristic(Position pos, int goalRow) {
         return Math.abs(pos.y - goalRow); // admissible: each step reduces row-distance by at most 1
     }
 
@@ -115,7 +115,7 @@ public class Logic {
             if (nx < 0 || nx >= BOARD_SIZE || ny < 0 || ny >= BOARD_SIZE) continue;
             Position nb = new Position(nx, ny);
             if (blocked != null && nb.equals(blocked)) continue;
-            if (Move.IsValidMove(new Move(from, nb), forbidden)) result.add(nb);
+            if (Move.isLegalMove(new Move(from, nb), forbidden)) result.add(nb);
         }
         return result;
     }

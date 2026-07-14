@@ -16,7 +16,7 @@ public class Move {
         return new Move(this.targetPos, this.startPos);
     }
 
-    public static boolean IsValidMove(Move move, List<Move> forbiddenMoves) {
+    public static boolean isLegalMove(Move move, List<Move> forbiddenMoves) {
         if (move == null) return false;
         return !forbiddenMoves.contains(move) && !forbiddenMoves.contains(move.reversed());
     }

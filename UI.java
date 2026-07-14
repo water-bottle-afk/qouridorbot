@@ -62,7 +62,7 @@ public class UI extends JPanel {
     private final Player         player1, player2;
     private final List<WallData> boardWalls;
     private final List<Move>     forbiddenMoves;
-    private final List<Position> possibleMoveTargets;
+    private final List<Position> legalMoveTargets;
     private final List<Position> astarPath;
     private final Map<String, Integer> stateHistory;
 
@@ -85,7 +85,7 @@ public class UI extends JPanel {
         this.player2             = player2;
         this.boardWalls          = new ArrayList<>();
         this.forbiddenMoves      = new ArrayList<>();
-        this.possibleMoveTargets = new ArrayList<>();
+        this.legalMoveTargets    = new ArrayList<>();
         this.astarPath           = new ArrayList<>();
         this.stateHistory        = new HashMap<>();
         this.currentTurn         = 1;
@@ -245,7 +245,7 @@ public class UI extends JPanel {
             return;
         }
         if (selectedPlayer != null) {
-            for (Position t : possibleMoveTargets) {
+            for (Position t : legalMoveTargets) {
                 if (hitsCell(bx, by, t)) { commitMove(selectedPlayer, t); return; }
             }
         }
@@ -295,25 +295,25 @@ public class UI extends JPanel {
 
     private void clearSelection() {
         selectedPlayer = null;
-        possibleMoveTargets.clear();
+        legalMoveTargets.clear();
         repaint();
     }
 
     private void refreshMoveTargets() {
-        selectedPlayer.GetPossibleMoves(forbiddenMoves);
-        possibleMoveTargets.clear();
+        selectedPlayer.getLegalMoves(forbiddenMoves);
+        legalMoveTargets.clear();
         Position opponentPos = (selectedPlayer == player1) ? player2.getPosition() : player1.getPosition();
-        for (Move move : selectedPlayer.possibleMoves) {
+        for (Move move : selectedPlayer.legalMoves) {
             Position target = move.getTargetPos();
             if (!target.equals(opponentPos))
-                possibleMoveTargets.add(target);
+                legalMoveTargets.add(target);
         }
     }
 
     private void commitMove(Player player, Position target) {
         player.setPosition(target);
         selectedPlayer = null;
-        possibleMoveTargets.clear();
+        legalMoveTargets.clear();
         checkWin(player);
         if (gameState == GameState.PLAYING) {
             astarPath.clear();
@@ -383,7 +383,7 @@ public class UI extends JPanel {
         paintAstarPath(gfx);
         paintBoardWalls(gfx);
         paintGhostWall(gfx);
-        paintPossibleMoves(gfx);
+        paintLegalMoves(gfx);
         paintPlayerPiece(gfx, player1, P1_BLUE);
         paintPlayerPiece(gfx, player2, P2_RED);
     }
@@ -475,10 +475,10 @@ public class UI extends JPanel {
         }
     }
 
-    private void paintPossibleMoves(Graphics2D gfx) {
-        if (possibleMoveTargets.isEmpty()) return;
+    private void paintLegalMoves(Graphics2D gfx) {
+        if (legalMoveTargets.isEmpty()) return;
         int pad = 10, size = CELL_SIZE - 2 * pad;
-        for (Position t : possibleMoveTargets) {
+        for (Position t : legalMoveTargets) {
             int px = cellLeft(t.x) + pad, py = cellTop(t.y) + pad;
             gfx.setColor(new Color(55, 208, 88, 55));
             gfx.fillOval(px, py, size, size);
